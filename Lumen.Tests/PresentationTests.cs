@@ -58,6 +58,8 @@ public class PresentationTests
             Assert.InRange(value, 0, 1);
         }
 
+        Assert.InRange(v.NetFlow, -1, 1);
+        Assert.True(v.NetFlow < 0); // full load drains the battery
         Assert.Equal(system.Current.State, v.SystemState);
         Assert.NotNull(v.StressedSubsystem);
     }
@@ -133,6 +135,9 @@ public class PresentationTests
         coach.Show();
         Assert.Equal("TOUCH THE CORE", coach.Prompt);
         coach.OnContact();
+        coach.OnHeld(200);
+        Assert.Equal("TOUCH THE CORE", coach.Prompt);
+        coach.OnHeld(450);
         Assert.Equal("HOLD", coach.Prompt);
         coach.OnCharged();
         Assert.Equal("RELEASE", coach.Prompt);
@@ -150,6 +155,7 @@ public class PresentationTests
         var coach = new OnboardingCoach();
         coach.Show();
         coach.OnContact();
+        coach.OnHeld(500);
         coach.OnReleasedEarly();
         Assert.Equal(CoachStep.TouchTheCore, coach.Step);
     }

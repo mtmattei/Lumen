@@ -1,0 +1,74 @@
+<UserControl x:Class="Lumen.Presentation.Overview.OverviewPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Lumen.Controls"
+             xmlns:shell="using:Lumen.Presentation.Shell">
+  <StackPanel Spacing="0">
+    <!-- System health: ring + state word + glyph. State is never colour-only. -->
+    <StackPanel Padding="{StaticResource SectionPadding}" Spacing="16">
+      <TextBlock Text="SYSTEM HEALTH" Style="{StaticResource SectionHeaderStyle}" />
+      <Grid Width="148" Height="148" HorizontalAlignment="Center">
+        <controls:HealthRing x:Name="Ring" />
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+          <TextBlock HorizontalAlignment="Center" Style="{StaticResource ValueSmallTextStyle}"
+                     Text="{x:Bind ViewModel.StateLabel, Mode=OneWay}" />
+          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+            <TextBlock Style="{StaticResource LabelTextStyle}" Foreground="{x:Bind ViewModel.StateBrush, Mode=OneWay}"
+                       Text="{x:Bind ViewModel.StateGlyph, Mode=OneWay}" />
+            <TextBlock Style="{StaticResource QuietLabelTextStyle}" Text="{x:Bind ViewModel.HealthText, Mode=OneWay}" />
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+      <TextBlock Style="{StaticResource BodyTextStyle}" TextAlignment="Center" HorizontalAlignment="Center"
+                 Text="{x:Bind ViewModel.StateDescription, Mode=OneWay}"
+                 AutomationProperties.LiveSetting="Polite" />
+    </StackPanel>
+    <Rectangle Style="{StaticResource HairlineDividerStyle}" />
+
+    <!-- Active events -->
+    <StackPanel Padding="{StaticResource SectionPadding}">
+      <TextBlock Text="ACTIVE EVENTS" Style="{StaticResource SectionHeaderStyle}" />
+      <StackPanel Orientation="Horizontal" Spacing="12" Visibility="{x:Bind ViewModel.HasNoEvents, Mode=OneWay}">
+        <TextBlock Text="●" Style="{StaticResource LabelTextStyle}" Foreground="{StaticResource NominalBrush}" />
+        <TextBlock Text="No active issues" Style="{StaticResource BodyTextStyle}" />
+      </StackPanel>
+      <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveEvents}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="shell:EventItem">
+            <Grid ColumnSpacing="12" Padding="0,4">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="{x:Bind Glyph}" Foreground="{x:Bind Brush}" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{x:Bind Message}" Style="{StaticResource BodyTextStyle}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+              <TextBlock Grid.Column="2" Text="{x:Bind Time}" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+    <Rectangle Style="{StaticResource HairlineDividerStyle}" />
+
+    <!-- SYSTEM LOAD is revealed by the first successful pulse. -->
+    <StackPanel x:Name="LoadSection" Padding="{StaticResource SectionPadding}"
+                Visibility="{x:Bind ViewModel.IsLoadControlRevealed, Mode=OneWay}">
+      <controls:InstrumentSlider Label="SYSTEM LOAD" Minimum="0" Maximum="100" TickFrequency="10"
+                                 Value="{x:Bind ViewModel.LoadSetpoint, Mode=TwoWay}"
+                                 ValueText="{x:Bind ViewModel.LoadText, Mode=OneWay}"
+                                 Hint="Drag: power draw, thermal load and Core intensity follow." />
+    </StackPanel>
+
+    <!-- Quick actions: text + direction, not filled cards. -->
+    <StackPanel Padding="{StaticResource SectionPadding}">
+      <TextBlock Text="QUICK ACTIONS" Style="{StaticResource SectionHeaderStyle}" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.SimulateFaultCommand}"
+              Content="Simulate cooling fault" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.ToggleExplodeCommand}"
+              Content="Explore system" Margin="0,8,0,0" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.ToggleReducedMotionCommand}"
+              Content="Toggle reduced motion" Margin="0,8,0,0" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

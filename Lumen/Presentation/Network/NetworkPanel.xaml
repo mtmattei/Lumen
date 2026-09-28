@@ -1,0 +1,32 @@
+<UserControl x:Class="Lumen.Presentation.Network.NetworkPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Lumen.Presentation.Shell">
+  <StackPanel Padding="{StaticResource SectionPadding}">
+    <TextBlock Text="NETWORK · SYSTEM 01" Style="{StaticResource SectionHeaderStyle}" />
+    <TextBlock Style="{StaticResource BodyTextStyle}" Margin="0,0,0,16"
+               Text="Application instances observing System 01. One application, every platform." />
+    <ItemsControl ItemsSource="{x:Bind ViewModel.NetworkNodes}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="shell:NetworkNodeItem">
+          <Grid Padding="0,12" RowSpacing="6" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="{StaticResource HairlineBottom}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="{x:Bind Platform}" Style="{StaticResource LabelTextStyle}" Foreground="{StaticResource PrimaryTextBrush}" />
+            <TextBlock Grid.Column="1" Text="{x:Bind LatencyText, Mode=OneWay}" Style="{StaticResource ValueSmallTextStyle}" />
+            <TextBlock Grid.Row="1" Text="{x:Bind ConnectionText, Mode=OneWay}" Foreground="{x:Bind ConnectionBrush, Mode=OneWay}" Style="{StaticResource CaptionTextStyle}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind LastTelemetryText, Mode=OneWay}" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Right" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <TextBlock Style="{StaticResource CaptionTextStyle}" Margin="0,16,0,0"
+               Text="Simulated in v1: every instance reads the same authoritative C# state." />
+  </StackPanel>
+</UserControl>

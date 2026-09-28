@@ -1,6 +1,8 @@
 <Project Sdk="Uno.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-browserwasm;net10.0-desktop</TargetFrameworks>
+    <!-- Build a single head without the other workloads: dotnet build -p:LumenTfm=net10.0-desktop -->
+    <TargetFrameworks Condition="'$(LumenTfm)' != ''">$(LumenTfm)</TargetFrameworks>
 
     <OutputType>Exe</OutputType>
     <UnoSingleProject>true</UnoSingleProject>
@@ -15,7 +17,7 @@
     <!-- Package Publisher -->
     <ApplicationPublisher>Lumen</ApplicationPublisher>
     <!-- Package Description -->
-    <Description>Lumen powered by Uno Platform.</Description>
+    <Description>LUMEN, a living-machine showcase built with Uno Platform.</Description>
 
     <!--
       UnoFeatures are used to quickly add and manage features enabled for your app.
@@ -28,5 +30,9 @@
       SkiaRenderer;
     </UnoFeatures>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
+  </ItemGroup>
 
 </Project>

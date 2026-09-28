@@ -34,4 +34,7 @@ public interface ILumenCorePresenter
     void SetReveal(double progress);
 
     void SetReducedMotion(bool reduced);
+
+    /// <summary>Instances shown around System 01 in Network mode.</summary>
+    void SetNetwork(IReadOnlyList<Lumen.Simulation.NetworkNode> nodes);
 }

@@ -1,0 +1,58 @@
+<UserControl x:Class="Lumen.Presentation.Diagnostics.DiagnosticsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Lumen.Controls"
+             xmlns:shell="using:Lumen.Presentation.Shell">
+  <StackPanel>
+    <StackPanel Padding="{StaticResource SectionPadding}" Spacing="16">
+      <TextBlock Text="PRIMARY SCENARIO" Style="{StaticResource SectionHeaderStyle}" />
+      <TextBlock Text="{x:Bind ViewModel.ScenarioStatus, Mode=OneWay}" Style="{StaticResource LabelTextStyle}"
+                 AutomationProperties.LiveSetting="Polite" />
+      <Grid ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <controls:TelemetryReadout Label="PUMP" Value="{x:Bind ViewModel.PumpText, Mode=OneWay}" />
+        <controls:TelemetryReadout Grid.Column="1" Label="COOLANT" Value="{x:Bind ViewModel.PressureText, Mode=OneWay}" />
+        <controls:TelemetryReadout Grid.Column="2" Label="CORE" Value="{x:Bind ViewModel.ThermalText, Mode=OneWay}"
+                                   ValueBrush="{x:Bind ViewModel.ThermalBrush, Mode=OneWay}" />
+      </Grid>
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.SimulateFaultCommand}"
+              Content="Run cooling pump degradation" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InitiateRecoveryCommand}"
+              Content="Initiate recovery" />
+    </StackPanel>
+    <Rectangle Style="{StaticResource HairlineDividerStyle}" />
+    <StackPanel Padding="{StaticResource SectionPadding}">
+      <TextBlock Text="INJECT FAULT" Style="{StaticResource SectionHeaderStyle}" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InjectFaultCommand}" CommandParameter="PowerDeficit" Content="Power deficit" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InjectFaultCommand}" CommandParameter="NetworkDegradation" Content="Network degradation" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InjectFaultCommand}" CommandParameter="SensorFailure" Content="Sensor failure" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InjectFaultCommand}" CommandParameter="ComputeOverload" Content="Compute overload" />
+      <Button Style="{StaticResource LumenTextButtonStyle}" Command="{x:Bind ViewModel.InjectFaultCommand}" CommandParameter="NavigationLoss" Content="Navigation loss" />
+    </StackPanel>
+    <Rectangle Style="{StaticResource HairlineDividerStyle}" />
+    <StackPanel Padding="{StaticResource SectionPadding}">
+      <TextBlock Text="EVENT LOG" Style="{StaticResource SectionHeaderStyle}" />
+      <TextBlock Text="No events recorded." Style="{StaticResource BodyTextStyle}" Visibility="{x:Bind ViewModel.HasNoEvents, Mode=OneWay}" />
+      <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveEvents}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="shell:EventItem">
+            <Grid ColumnSpacing="12" Padding="0,4">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="{x:Bind Glyph}" Foreground="{x:Bind Brush}" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{x:Bind Message}" Style="{StaticResource BodyTextStyle}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="2" Text="{x:Bind Time}" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,13 @@
+<UserControl x:Class="Lumen.Rive.CoreStage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             IsTabStop="True"
+             UseSystemFocusVisuals="True"
+             AutomationProperties.AutomationId="LivingCore">
+  <!-- Uno owns input, focus and semantics; the canvas only draws. -->
+  <Grid x:Name="HitArea" Background="{StaticResource TransparentBrush}">
+    <TextBlock x:Name="FallbackText" Visibility="Collapsed" Style="{StaticResource LabelTextStyle}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+               Text="CORE VISUAL UNAVAILABLE&#x0a;STATUS AND CONTROLS REMAIN LIVE" />
+  </Grid>
+</UserControl>

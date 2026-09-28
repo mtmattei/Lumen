@@ -25,6 +25,7 @@ public static class VisualStateMapper
             Clamp01((t.Temperature - 20) / 70.0),
             Clamp01(t.SystemLoad / 16.0),
             Clamp01(Math.Log10(Math.Max(1, t.NetworkLatency)) / Math.Log10(500)),
+            double.IsFinite(t.NetPower) ? Math.Clamp(t.NetPower / 8.0, -1, 1) : 0,
             stressed);
     }
 

@@ -1,0 +1,25 @@
+<UserControl x:Class="Lumen.Controls.TelemetryReadout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Large value + quiet label. Detail lines stay tertiary. -->
+  <Grid RowSpacing="6">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <TextBlock Text="{x:Bind Label, Mode=OneWay}" Style="{StaticResource LabelTextStyle}" />
+    <TextBlock x:Name="ValueText" Grid.Row="1" Text="{x:Bind Value, Mode=OneWay}"
+               Style="{StaticResource ValueTextStyle}" Foreground="{x:Bind ValueBrush, Mode=OneWay}" />
+    <Grid Grid.Row="2" Height="2" Width="112" HorizontalAlignment="Left"
+          Visibility="{x:Bind BarVisibility, Mode=OneWay}">
+      <Rectangle Fill="{StaticResource StructuralBrush}" />
+      <Rectangle x:Name="BarFill" HorizontalAlignment="Left" Fill="{x:Bind BarBrush, Mode=OneWay}" />
+    </Grid>
+    <TextBlock Grid.Row="3" Text="{x:Bind Detail, Mode=OneWay}" Style="{StaticResource QuietLabelTextStyle}"
+               LineHeight="18" Visibility="{x:Bind DetailVisibility, Mode=OneWay}" />
+    <Rectangle x:Name="PulseLine" Grid.Row="1" Height="1" VerticalAlignment="Bottom" Margin="0,0,0,-3"
+               HorizontalAlignment="Stretch" Fill="{StaticResource PrimaryTextBrush}" Opacity="0" />
+  </Grid>
+</UserControl>

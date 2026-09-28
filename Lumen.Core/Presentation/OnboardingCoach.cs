@@ -34,30 +34,33 @@ public sealed class OnboardingCoach
         if (Step == CoachStep.Hidden) Step = CoachStep.TouchTheCore;
     }
 
-    public void OnContact()
-    {
-        if (Step is CoachStep.TouchTheCore or CoachStep.Hold) Step = CoachStep.Hold;
-    }
+    public bool IsInContact { get; private set; }
+
+    /// <summary>Contact alone keeps TOUCH THE CORE; HOLD appears once the press has lasted ~400 ms.</summary>
+    public void OnContact() => IsInContact = true;
 
     /// <summary>Called while held; the HOLD prompt only matters after ~400 ms.</summary>
     public void OnHeld(double heldMs)
     {
-        if (Step == CoachStep.TouchTheCore && heldMs >= PressGesture.HoldHintMs) Step = CoachStep.Hold;
+        if (IsInContact && Step == CoachStep.TouchTheCore && heldMs >= PressGesture.HoldHintMs) Step = CoachStep.Hold;
     }
 
     public void OnCharged()
     {
+        IsInContact = true;
         if (Step is CoachStep.TouchTheCore or CoachStep.Hold) Step = CoachStep.Release;
     }
 
     /// <summary>Released before charge: return to the touch prompt.</summary>
     public void OnReleasedEarly()
     {
+        IsInContact = false;
         if (Step is CoachStep.Hold or CoachStep.Release) Step = CoachStep.TouchTheCore;
     }
 
     public void OnPulseCompleted()
     {
+        IsInContact = false;
         if (Step is CoachStep.Complete or CoachStep.Hidden) return;
         Step = CoachStep.LinkEstablished;
         IsLoadControlRevealed = true;

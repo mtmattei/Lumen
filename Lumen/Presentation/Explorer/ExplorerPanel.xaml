@@ -1,0 +1,99 @@
+<UserControl x:Class="Lumen.Presentation.Explorer.ExplorerPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Lumen.Controls"
+             xmlns:shell="using:Lumen.Presentation.Shell">
+  <Grid>
+    <!-- Subsystem list: the semantic equivalent of the exploded Core. -->
+    <StackPanel Padding="{StaticResource SectionPadding}" Visibility="{x:Bind ViewModel.HasNoSelection, Mode=OneWay}">
+      <TextBlock Text="SYSTEM EXPLORER" Style="{StaticResource SectionHeaderStyle}" />
+      <TextBlock Style="{StaticResource BodyTextStyle}" Margin="0,0,0,16"
+                 Text="Select a subsystem on the Core or below. Arrow keys cycle, Enter inspects, Esc collapses." />
+      <ItemsControl ItemsSource="{x:Bind ViewModel.Subsystems}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="shell:SubsystemItem">
+            <Button Style="{StaticResource LumenTextButtonStyle}" Click="OnSubsystemClick" Tag="{x:Bind Id}"
+                    AutomationProperties.Name="{x:Bind AccessibleName, Mode=OneWay}">
+              <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="120" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind Name}" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{x:Bind Condition, Mode=OneWay}" Foreground="{x:Bind ConditionBrush, Mode=OneWay}"
+                           Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{x:Bind HealthText, Mode=OneWay}" Style="{StaticResource QuietLabelTextStyle}" VerticalAlignment="Center" />
+              </Grid>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+
+    <!-- Inspector: emerges from the selected node's side. -->
+    <StackPanel x:Name="Inspector" Padding="{StaticResource SectionPadding}" Spacing="24"
+                Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay}">
+      <StackPanel.RenderTransform>
+        <TranslateTransform x:Name="InspectorShift" />
+      </StackPanel.RenderTransform>
+      <Grid>
+        <StackPanel Spacing="8">
+          <TextBlock Text="INSPECTOR" Style="{StaticResource QuietLabelTextStyle}" />
+          <TextBlock Text="{x:Bind ViewModel.InspectorTitle, Mode=OneWay}" Style="{StaticResource ValueTextStyle}" />
+          <TextBlock Text="{x:Bind ViewModel.InspectorCondition, Mode=OneWay}" Foreground="{x:Bind ViewModel.InspectorBrush, Mode=OneWay}"
+                     Style="{StaticResource LabelTextStyle}" AutomationProperties.LiveSetting="Polite" />
+        </StackPanel>
+        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource LumenTextButtonStyle}"
+                Command="{x:Bind ViewModel.CloseInspectorCommand}" Content="Close" Padding="0,0,0,4" />
+      </Grid>
+      <TextBlock Text="{x:Bind ViewModel.InspectorSummary, Mode=OneWay}" Style="{StaticResource BodyTextStyle}" />
+      <Grid ColumnSpacing="24" RowSpacing="24">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <controls:TelemetryReadout Label="HEALTH" Value="{x:Bind ViewModel.InspectorHealth, Mode=OneWay}" />
+        <controls:TelemetryReadout Grid.Row="1" Label="{x:Bind ViewModel.InspectorPrimaryLabel, Mode=OneWay}"
+                                   Value="{x:Bind ViewModel.InspectorPrimaryValue, Mode=OneWay}" />
+        <controls:TelemetryReadout Grid.Row="1" Grid.Column="1" Label="{x:Bind ViewModel.InspectorSecondaryLabel, Mode=OneWay}"
+                                   Value="{x:Bind ViewModel.InspectorSecondaryValue, Mode=OneWay}" />
+      </Grid>
+      <Rectangle Style="{StaticResource HairlineDividerStyle}" />
+
+      <!-- Controls update C# continuously; the Core responds during manipulation. -->
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsPowerSelected, Mode=OneWay}">
+        <controls:InstrumentSlider Label="SYSTEM LOAD" Maximum="100" TickFrequency="10"
+                                   Value="{x:Bind ViewModel.LoadSetpoint, Mode=TwoWay}" ValueText="{x:Bind ViewModel.LoadSetpointText, Mode=OneWay}" />
+        <controls:InstrumentToggle Label="SOLAR TRACKING" Description="Array follows the light source."
+                                   IsOn="{x:Bind ViewModel.SolarTracking, Mode=TwoWay}" />
+      </StackPanel>
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsEnvironmentSelected, Mode=OneWay}">
+        <controls:InstrumentSlider Label="VENTILATION" Maximum="100" TickFrequency="10"
+                                   Value="{x:Bind ViewModel.Ventilation, Mode=TwoWay}" ValueText="{x:Bind ViewModel.VentilationText, Mode=OneWay}" />
+      </StackPanel>
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsThermalSelected, Mode=OneWay}">
+        <controls:InstrumentSlider Label="COOLANT PUMP BOOST" Maximum="100" TickFrequency="10"
+                                   Value="{x:Bind ViewModel.PumpBoost, Mode=TwoWay}" ValueText="{x:Bind ViewModel.PumpBoostText, Mode=OneWay}"
+                                   Hint="More drive raises coolant pressure and cooling capacity." />
+        <controls:TelemetryReadout Label="PUMP EFFICIENCY" Value="{x:Bind ViewModel.PumpText, Mode=OneWay}" />
+      </StackPanel>
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsNavigationSelected, Mode=OneWay}">
+        <controls:InstrumentSlider Label="HEADING" Maximum="359" TickFrequency="45"
+                                   Value="{x:Bind ViewModel.HeadingTarget, Mode=TwoWay}" ValueText="{x:Bind ViewModel.HeadingTargetText, Mode=OneWay}" />
+      </StackPanel>
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsCommunicationsSelected, Mode=OneWay}">
+        <controls:InstrumentToggle Label="SATELLITE SYNC" Description="Relay through the satellite link."
+                                   IsOn="{x:Bind ViewModel.SatelliteSync, Mode=TwoWay}" />
+      </StackPanel>
+      <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.IsComputeSelected, Mode=OneWay}">
+        <controls:InstrumentSlider Label="COMPUTE ALLOCATION" Maximum="100" TickFrequency="10"
+                                   Value="{x:Bind ViewModel.ComputeAllocation, Mode=TwoWay}" ValueText="{x:Bind ViewModel.ComputeAllocationText, Mode=OneWay}" />
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+</UserControl>

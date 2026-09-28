@@ -4,8 +4,9 @@ namespace Lumen.Presentation;
 
 /// <summary>
 /// Normalized, presentation-only view of authoritative state. Mirrors the `LumenCore` state machine inputs
-/// (spec-kit/rive/RIVE_CORE_SPEC.md). All numeric values are 0..1.
+/// (spec-kit/rive/RIVE_CORE_SPEC.md). Numeric values are 0..1 unless noted.
 /// </summary>
+/// <param name="NetFlow">Contract extension, -1..1: battery transfer direction and volume (positive = charging).</param>
 /// <param name="StressedSubsystem">Contract extension: the subsystem expressing instability, or null.</param>
 public readonly record struct LumenVisualState(
     SystemState SystemState,
@@ -14,6 +15,7 @@ public readonly record struct LumenVisualState(
     double Temperature,
     double Load,
     double Latency,
+    double NetFlow,
     SubsystemId? StressedSubsystem);
 
 /// <summary>Pointer/press/tilt inputs. Written at pointer rate without touching XAML.</summary>

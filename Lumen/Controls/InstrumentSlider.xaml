@@ -1,0 +1,28 @@
+<UserControl x:Class="Lumen.Controls.InstrumentSlider"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Instrument slider: label left, live mono value right, ticks under the track. Updates continuously. -->
+  <Grid RowSpacing="4">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+    <TextBlock Text="{x:Bind Label, Mode=OneWay}" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Bottom" />
+    <TextBlock x:Name="ValueLabel" Grid.Column="1" Text="{x:Bind ValueText, Mode=OneWay}"
+               Style="{StaticResource ValueSmallTextStyle}" />
+    <Slider x:Name="Track" Grid.Row="1" Grid.ColumnSpan="2"
+            Minimum="{x:Bind Minimum, Mode=OneWay}" Maximum="{x:Bind Maximum, Mode=OneWay}"
+            StepFrequency="{x:Bind StepFrequency, Mode=OneWay}" TickFrequency="{x:Bind TickFrequency, Mode=OneWay}"
+            Value="{x:Bind Value, Mode=TwoWay}"
+            AutomationProperties.Name="{x:Bind Label, Mode=OneWay}" />
+    <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Bind Hint, Mode=OneWay}"
+               Style="{StaticResource CaptionTextStyle}" Visibility="{x:Bind HintVisibility, Mode=OneWay}" />
+    <Rectangle x:Name="PulseLine" Grid.Row="0" Grid.ColumnSpan="2" Height="1" VerticalAlignment="Bottom" Margin="0,0,0,-2"
+               Fill="{StaticResource PrimaryTextBrush}" Opacity="0" />
+  </Grid>
+</UserControl>

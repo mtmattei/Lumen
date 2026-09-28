@@ -1,4 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using Lumen.Presentation.Shell;
+using Lumen.Services;
+using Lumen.Simulation;
 using Uno.Resizetizer;
 
 namespace Lumen;
@@ -16,6 +19,9 @@ public partial class App : Application
 
     protected Window? MainWindow { get; private set; }
     protected IHost? Host { get; private set; }
+
+    /// <summary>Root service provider. Views resolve their view model from here.</summary>
+    public static IServiceProvider Services { get; private set; } = null!;
 
     [SuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Uno.Extensions APIs are used in a way that is safe for trimming in this template context.")]
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -58,18 +64,23 @@ public partial class App : Application
                 }, enableUnoLogging: true)
                 .ConfigureServices((context, services) =>
                 {
-                    // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
+                    // Authoritative model: simulator, scenario and log advance together.
+                    services.AddSingleton<LumenSystem>();
+                    services.AddSingleton<ShellViewModel>();
+                    services.AddSingleton<TelemetryHost>();
+                    services.AddSingleton<DeviceSensorService>();
                 })
             );
         MainWindow = builder.Window;
 
-        #if DEBUG
+#if DEBUG
         MainWindow.UseStudio();
 #endif
-                MainWindow.SetWindowIcon();
+        MainWindow.SetWindowIcon();
+        MainWindow.Title = "LUMEN";
 
         Host = builder.Build();
+        Services = Host.Services;
 
         // Do not repeat app initialization when the Window already has content,
         // just ensure that the window is active
@@ -87,7 +98,7 @@ public partial class App : Application
             // When the navigation stack isn't restored navigate to the first page,
             // configuring the new page by passing required information as a navigation
             // parameter
-            rootFrame.Navigate(typeof(MainPage), args.Arguments);
+            rootFrame.Navigate(typeof(ShellPage), args.Arguments);
         }
         // Ensure the current window is active
         MainWindow.Activate();
