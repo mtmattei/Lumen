@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Lumen</RootNamespace>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Lumen.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Single source of truth: the spec-kit fixtures ship embedded. -->
+    <EmbeddedResource Include="..\spec-kit\fixtures\cooling-fault.timeline.json" LogicalName="cooling-fault.timeline.json" />
+    <EmbeddedResource Include="..\spec-kit\fixtures\telemetry.nominal.json" LogicalName="telemetry.nominal.json" />
+  </ItemGroup>
+</Project>
