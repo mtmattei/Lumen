@@ -828,7 +828,8 @@ public sealed class LumenCoreRenderer : IDisposable
             var u = p.Age / 1.8;
             var ox = cx + (float)(p.OriginX * r * (1 - Math.Min(1, p.Age * 2)));
             var oy = cy + (float)(p.OriginY * r * (1 - Math.Min(1, p.Age * 2)));
-            var radius = (float)(r * (0.15 + 3.4 * EaseOut(u)));
+            // Reduced motion keeps the pulse as local feedback instead of a screen-wide sweep.
+            var radius = (float)(r * (0.15 + (_reducedMotion ? 1.4 : 3.4) * EaseOut(u)));
             _stroke.StrokeWidth = 2;
             _stroke.Color = Warm.WithAlpha(A(0.7 * (1 - u)));
             canvas.DrawCircle(ox, oy, radius, _stroke);

@@ -127,7 +127,7 @@ public sealed partial class CoreStage : UserControl
                 e.Handled = true;
                 break;
             case VirtualKey.Space or VirtualKey.Enter:
-                if (_press.Phase == PressPhase.Idle && !e.KeyStatus.WasKeyDown)
+                if (_press.Phase == PressPhase.Idle)
                 {
                     (_contactX, _contactY) = (0, 0);
                     BeginPress();
