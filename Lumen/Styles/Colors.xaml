@@ -36,26 +36,4 @@
   <SolidColorBrush x:Key="OfflineBrush" Color="{StaticResource OfflineColor}" />
   <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
 
-  <!-- Fluent lightweight-styling overrides so stock controls sit on the neutral palette. -->
-  <SolidColorBrush x:Key="SliderTrackFill" Color="{StaticResource StructuralColor}" />
-  <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="{StaticResource StructuralColor}" />
-  <SolidColorBrush x:Key="SliderTrackFillPressed" Color="{StaticResource StructuralColor}" />
-  <SolidColorBrush x:Key="SliderTrackValueFill" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderThumbBackground" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="{StaticResource PrimaryTextColor}" />
-  <SolidColorBrush x:Key="SliderOuterThumbBackground" Color="{StaticResource CanvasColor}" />
-  <SolidColorBrush x:Key="SliderTickBarFill" Color="{StaticResource TertiaryTextColor}" />
-
-  <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="{StaticResource NominalColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="{StaticResource NominalColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="{StaticResource NominalColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchFillOff" Color="Transparent" />
-  <SolidColorBrush x:Key="ToggleSwitchStrokeOff" Color="{StaticResource TertiaryTextColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchKnobFillOff" Color="{StaticResource SecondaryTextColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchKnobFillOn" Color="{StaticResource CanvasColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchContentForeground" Color="{StaticResource SecondaryTextColor}" />
-  <SolidColorBrush x:Key="ToggleSwitchHeaderForeground" Color="{StaticResource TertiaryTextColor}" />
 </ResourceDictionary>

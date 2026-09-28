@@ -3,6 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsTabStop="True"
              UseSystemFocusVisuals="True"
+             FocusVisualPrimaryThickness="1"
+             FocusVisualSecondaryThickness="0"
+             FocusVisualPrimaryBrush="{StaticResource TertiaryTextBrush}"
              AutomationProperties.AutomationId="LivingCore">
   <!-- Uno owns input, focus and semantics; the canvas only draws. -->
   <Grid x:Name="HitArea" Background="{StaticResource TransparentBrush}">

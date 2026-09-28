@@ -52,6 +52,7 @@
 
   <Style x:Key="CaptionTextStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
+    <Setter Property="TextWrapping" Value="WrapWholeWords" />
     <Setter Property="FontSize" Value="10" />
     <Setter Property="Foreground" Value="{StaticResource TertiaryTextBrush}" />
   </Style>

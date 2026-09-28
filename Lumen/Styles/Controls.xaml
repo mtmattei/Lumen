@@ -74,6 +74,7 @@
     <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
     <Setter Property="FontSize" Value="11" />
     <Setter Property="Padding" Value="24,14,16,14" />
+    <Setter Property="MinWidth" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="UseSystemFocusVisuals" Value="True" />
     <Setter Property="Template">
@@ -119,7 +120,8 @@
   </Style>
 
   <Style x:Key="NavItemHorizontalStyle" TargetType="RadioButton" BasedOn="{StaticResource NavItemStyle}">
-    <Setter Property="Padding" Value="12,12,12,12" />
+    <Setter Property="Padding" Value="10,12,10,12" />
+    <Setter Property="MinWidth" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="Template">
       <Setter.Value>

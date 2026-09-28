@@ -59,7 +59,8 @@
         </StackPanel>
         <StackPanel x:Name="Meta" Grid.Row="1" Padding="32,0,16,24" Spacing="4">
           <TextBlock Text="SYSTEM 01" Style="{StaticResource LabelTextStyle}" />
-          <TextBlock Text="v0.1 · UNO + CORE CONTRACT" Style="{StaticResource CaptionTextStyle}" />
+          <TextBlock Text="v0.1" Style="{StaticResource CaptionTextStyle}" />
+          <TextBlock Text="UNO + CORE CONTRACT" Style="{StaticResource CaptionTextStyle}" />
           <TextBlock Text="BUILT WITH .NET" Style="{StaticResource CaptionTextStyle}" />
         </StackPanel>
       </Grid>
@@ -85,14 +86,19 @@
           </StackPanel>
         </Canvas>
 
-        <!-- First-run titles and the in-place coach. No modal. -->
-        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,24" Spacing="8" IsHitTestVisible="False">
-          <TextBlock x:Name="SystemTitle" Text="S Y S T E M   0 1" Style="{StaticResource PromptTextStyle}" Opacity="0" />
-          <TextBlock x:Name="InitializedText" Text="SYSTEM INITIALIZED  ·  6 SUBSYSTEMS ONLINE" Style="{StaticResource PromptTextStyle}"
-                     Foreground="{StaticResource SecondaryTextBrush}" Opacity="0" />
-          <TextBlock x:Name="CoachText" Text="{x:Bind ViewModel.CoachPrompt, Mode=OneWay}" Style="{StaticResource PromptTextStyle}"
-                     Visibility="{x:Bind ViewModel.IsCoachVisible, Mode=OneWay}" AutomationProperties.LiveSetting="Polite" />
-        </StackPanel>
+        <!-- First-run titles and the in-place coach, annotated on the lower axis. No modal. -->
+        <Canvas IsHitTestVisible="False">
+          <Grid x:Name="PromptStack">
+            <TextBlock x:Name="SystemTitle" Text="S Y S T E M   0 1" Style="{StaticResource PromptTextStyle}" HorizontalAlignment="Left" Opacity="0" />
+            <TextBlock x:Name="InitializedText" Text="SYSTEM INITIALIZED&#x0a;6 SUBSYSTEMS ONLINE" Style="{StaticResource PromptTextStyle}"
+                       HorizontalAlignment="Left" Foreground="{StaticResource SecondaryTextBrush}" LineHeight="18" Opacity="0" />
+            <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModel.IsCoachVisible, Mode=OneWay}">
+              <TextBlock Text="›" Style="{StaticResource PromptTextStyle}" Foreground="{StaticResource NominalBrush}" />
+              <TextBlock x:Name="CoachText" Text="{x:Bind ViewModel.CoachPrompt, Mode=OneWay}" Style="{StaticResource PromptTextStyle}"
+                         AutomationProperties.LiveSetting="Polite" />
+            </StackPanel>
+          </Grid>
+        </Canvas>
       </Grid>
 
       <!-- Compact condition line (mobile). -->

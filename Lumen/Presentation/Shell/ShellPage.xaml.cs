@@ -248,8 +248,8 @@ public sealed partial class ShellPage : Page
 
     private void OnPageKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Control) _ctrlDown = true;
-        if (e.Key == VirtualKey.Shift) _shiftDown = true;
+        if (e.Key is VirtualKey.Control or VirtualKey.LeftControl or VirtualKey.RightControl) _ctrlDown = true;
+        if (e.Key is VirtualKey.Shift or VirtualKey.LeftShift or VirtualKey.RightShift) _shiftDown = true;
         if (e.Key == VirtualKey.D && _ctrlDown && _shiftDown)
         {
             ViewModel.ToggleDeveloperModeCommand.Execute(null);
@@ -261,8 +261,8 @@ public sealed partial class ShellPage : Page
 
     private void OnPageKeyUp(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Control) _ctrlDown = false;
-        if (e.Key == VirtualKey.Shift) _shiftDown = false;
+        if (e.Key is VirtualKey.Control or VirtualKey.LeftControl or VirtualKey.RightControl) _ctrlDown = false;
+        if (e.Key is VirtualKey.Shift or VirtualKey.LeftShift or VirtualKey.RightShift) _shiftDown = false;
     }
 
     // ── Navigation sync ──────────────────────────────────────────────────────
@@ -400,24 +400,33 @@ public sealed partial class ShellPage : Page
     /// <summary>Primary telemetry sits on the Core's instrument axes (same geometry as the renderer).</summary>
     private void PositionOrbitReadouts(double width, double height)
     {
-        var r = Math.Min(width, height) * 0.27;
+        var r = Math.Min(width, height) * Rive.LumenCoreRenderer.RadiusFactor;
         var ring = r * 1.5;
         var cx = width / 2;
         var cy = height / 2;
+        var unbounded = new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity);
 
-        PowerReadout.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-        Canvas.SetLeft(PowerReadout, Math.Max(16, cx - ring * 1.12 - 24 - PowerReadout.DesiredSize.Width));
+        // Short stages keep only the horizontal pair; the rail and context panel carry the rest.
+        var roomy = height >= 560;
+        EnvironmentReadout.Visibility = NavigationReadout.Visibility = roomy ? Visibility.Visible : Visibility.Collapsed;
+
+        PowerReadout.Measure(unbounded);
+        Canvas.SetLeft(PowerReadout, Math.Max(16, cx - ring * 1.1 - 24 - PowerReadout.DesiredSize.Width));
         Canvas.SetTop(PowerReadout, cy - 36);
 
-        Canvas.SetLeft(CommsReadout, cx + ring * 1.12 + 24);
+        Canvas.SetLeft(CommsReadout, cx + ring * 1.1 + 24);
         Canvas.SetTop(CommsReadout, cy - 36);
 
+        // Environment right of the upper axis; Navigation left of the lower axis; the prompt right of it.
         Canvas.SetLeft(EnvironmentReadout, cx + 24);
-        Canvas.SetTop(EnvironmentReadout, Math.Max(8, cy - ring * 1.18));
+        Canvas.SetTop(EnvironmentReadout, Math.Max(8, cy - ring * 1.08));
 
-        NavigationReadout.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-        Canvas.SetLeft(NavigationReadout, cx + 24);
-        Canvas.SetTop(NavigationReadout, Math.Min(height - NavigationReadout.DesiredSize.Height - 8, cy + ring * 1.18 - NavigationReadout.DesiredSize.Height));
+        NavigationReadout.Measure(unbounded);
+        Canvas.SetLeft(NavigationReadout, cx - 24 - NavigationReadout.DesiredSize.Width);
+        Canvas.SetTop(NavigationReadout, Math.Min(height - NavigationReadout.DesiredSize.Height - 8, cy + ring * 1.02));
+
+        Canvas.SetLeft(PromptStack, cx + 24);
+        Canvas.SetTop(PromptStack, Math.Min(height - 72, cy + ring * 1.02 + 20));
 
         if (ViewModel.DeveloperMode) UpdateDeveloperOverlay();
     }

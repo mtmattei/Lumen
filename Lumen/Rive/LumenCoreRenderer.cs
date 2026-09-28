@@ -12,6 +12,9 @@ namespace Lumen.Rive;
 /// </summary>
 public sealed class LumenCoreRenderer : IDisposable
 {
+    /// <summary>Core radius as a fraction of the stage's short side. XAML readouts use the same geometry.</summary>
+    public const double RadiusFactor = 0.25;
+
     private const int ParticleCount = 240;
     private const double TwoPi = Math.PI * 2;
 
@@ -293,7 +296,7 @@ public sealed class LumenCoreRenderer : IDisposable
         if (width < 8 || height < 8) return;
 
         var minSide = Math.Min(width, height);
-        var baseRadius = minSide * 0.27f;
+        var baseRadius = minSide * (float)RadiusFactor;
         var shrink = 1 - 0.38 * _explode - 0.3 * Math.Max(_flowMode, _networkMode);
         var r = (float)(baseRadius * shrink);
         var cx = width / 2f - (float)(_focusOffset * width * 0.16);
@@ -358,7 +361,7 @@ public sealed class LumenCoreRenderer : IDisposable
 
         // Vertical axis and horizontal stubs, like an instrument crosshair.
         _stroke.Color = Hairline.WithAlpha(A(0.28 * alpha));
-        canvas.DrawLine(cx, cy - ring * 1.18f, cx, cy + ring * 1.18f, _stroke);
+        canvas.DrawLine(cx, cy - ring * 1.08f, cx, cy + ring * 1.08f, _stroke);
         canvas.DrawLine(cx - ring * 1.12f, cy, cx - r * 1.08f, cy, _stroke);
         canvas.DrawLine(cx + r * 1.08f, cy, cx + ring * 1.12f, cy, _stroke);
 
@@ -373,8 +376,8 @@ public sealed class LumenCoreRenderer : IDisposable
         }
 
         _fill.Color = Hairline.WithAlpha(A(0.9 * alpha));
-        canvas.DrawCircle(cx, cy - ring * 1.18f, 2, _fill);
-        canvas.DrawCircle(cx, cy + ring * 1.18f, 2, _fill);
+        canvas.DrawCircle(cx, cy - ring * 1.08f, 2, _fill);
+        canvas.DrawCircle(cx, cy + ring * 1.08f, 2, _fill);
         canvas.DrawCircle(cx - ring * 1.12f, cy, 3, _fill);
         canvas.DrawCircle(cx + ring * 1.12f, cy, 3, _fill);
     }
@@ -653,11 +656,12 @@ public sealed class LumenCoreRenderer : IDisposable
             var x = cx + (float)(Math.Cos(a) * distance);
             var y = cy + (float)(Math.Sin(a) * distance);
 
-            // The selected node moves toward focus (the inspector side).
-            var focusX = cx + r * 2.6f;
-            x += (float)((focusX - x) * 0.55 * selected);
-            y += (float)((cy - y) * 0.55 * selected);
+            // The selected node moves toward focus: beside the Core, on the inspector side.
+            var focusX = cx + r * 2.2f;
+            x += (float)((focusX - x) * selected);
+            y += (float)((cy - y) * selected);
             _nodePositions[i] = new SKPoint(x, y);
+            var connectorAngle = Math.Atan2(y - cy, x - cx);
 
             if (alpha < 0.01) continue;
             var nodeAlpha = alpha * (1 - 0.7 * recede);
@@ -671,11 +675,11 @@ public sealed class LumenCoreRenderer : IDisposable
             var condition = _target.StressedSubsystem == (SubsystemId)i ? StressColor() : Hairline;
 
             // Connector with energy travelling outward.
-            var inner = (float)MembraneRadius(a, r);
+            var inner = (float)MembraneRadius(connectorAngle, r);
             _stroke.StrokeWidth = 1;
             _stroke.Color = Hairline.WithAlpha(A(0.22 * e));
-            var sx = cx + (float)Math.Cos(a) * inner;
-            var sy = cy + (float)Math.Sin(a) * inner;
+            var sx = cx + (float)Math.Cos(connectorAngle) * inner;
+            var sy = cy + (float)Math.Sin(connectorAngle) * inner;
             canvas.DrawLine(sx, sy, x, y, _stroke);
             var u = (float)((_time * (0.4 + _load) + i * 0.17) % 1.0);
             _glow.Color = Amber.WithAlpha(A(0.8 * e));

@@ -12,6 +12,38 @@
         <ResourceDictionary Source="ms-appx:///Styles/Typography.xaml" />
         <ResourceDictionary Source="ms-appx:///Styles/Controls.xaml" />
       </ResourceDictionary.MergedDictionaries>
+
+      <!-- Neutral accent: Fluent controls read as instruments, not branded chrome. -->
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+          <Color x:Key="SystemAccentColor">#F1F2EF</Color>
+          <Color x:Key="SystemAccentColorLight1">#F1F2EF</Color>
+          <Color x:Key="SystemAccentColorLight2">#F1F2EF</Color>
+          <Color x:Key="SystemAccentColorLight3">#F1F2EF</Color>
+          <Color x:Key="SystemAccentColorDark1">#969A96</Color>
+          <Color x:Key="SystemAccentColorDark2">#969A96</Color>
+          <Color x:Key="SystemAccentColorDark3">#969A96</Color>
+          <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#D8DAD6" />
+          <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#BFC1BD" />
+          <SolidColorBrush x:Key="SliderTrackValueFill" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderThumbBackground" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="SliderTrackFill" Color="#2D302E" />
+          <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#2D302E" />
+          <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#2D302E" />
+          <SolidColorBrush x:Key="SliderTickBarFill" Color="#646864" />
+          <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#F1F2EF" />
+          <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#D8DAD6" />
+          <SolidColorBrush x:Key="ToggleSwitchKnobFillOn" Color="#0B0C0C" />
+          <SolidColorBrush x:Key="ToggleSwitchKnobFillOnPointerOver" Color="#0B0C0C" />
+          <SolidColorBrush x:Key="ToggleSwitchKnobFillOnPressed" Color="#0B0C0C" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
   </Application.Resources>
 

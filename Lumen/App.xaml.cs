@@ -78,6 +78,18 @@ public partial class App : Application
 #endif
         MainWindow.SetWindowIcon();
         MainWindow.Title = "LUMEN";
+        if (!OperatingSystem.IsBrowser() && !OperatingSystem.IsAndroid() && !OperatingSystem.IsIOS())
+        {
+            // Reference desktop composition is 1440×900; LUMEN_WINDOW=WxH overrides it (e.g. 390x844 to check mobile).
+            var (width, height) = (1440, 900);
+            if (Environment.GetEnvironmentVariable("LUMEN_WINDOW")?.Split('x') is [var w, var h]
+                && int.TryParse(w, out var pw) && int.TryParse(h, out var ph))
+            {
+                (width, height) = (pw, ph);
+            }
+
+            MainWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = width, Height = height });
+        }
 
         Host = builder.Build();
         Services = Host.Services;
