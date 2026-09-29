@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Lumen.Rive</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- liblumen_rive built by native/lumen-rive (build.sh / build.ps1); copied with its runtimes/<rid>/native layout. -->
+    <None Include="runtimes/**/native/*" CopyToOutputDirectory="PreserveNewest" Link="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

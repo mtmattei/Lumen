@@ -66,10 +66,20 @@ class Schema:
         raise KeyError(f"{type_name}.{prop} not in schema")
 
 
+# Field-type ids used by the property table of contents (rive/core/field_types).
+TOC_FIELD = {"uint": 0, "string": 1, "double": 2, "color": 3}
+
+
 class RivFile:
     def __init__(self, schema: Schema):
         self.schema = schema
         self.objects: list[tuple[str, dict]] = []
+        # Keys listed here are declared in the header so older runtimes can skip properties they don't know.
+        self.toc: dict[int, str] = {}
+
+    def declare(self, type_name: str, prop: str) -> None:
+        key, kind = self.schema.prop(type_name, prop)
+        self.toc[key] = kind or "uint"
 
     def add(self, type_name: str, **props) -> int:
         """Append an object; returns its index in the file stream."""
@@ -104,7 +114,15 @@ class RivFile:
     def to_bytes(self) -> bytes:
         out = bytearray(b"RIVE")
         out += varuint(MAJOR) + varuint(MINOR) + varuint(0)
-        out += varuint(0)  # empty property table of contents: only known keys are written
+        keys = sorted(self.toc)
+        for key in keys:
+            out += varuint(key)
+        out += varuint(0)
+        for i in range(0, len(keys), 16):  # 2 bits per key, 16 keys per uint32
+            word = 0
+            for bit, key in enumerate(keys[i:i + 16]):
+                word |= TOC_FIELD[self.toc[key]] << (bit * 2)
+            out += struct.pack("<I", word)
         for type_name, props in self.objects:
             out += varuint(self.schema.type_key(type_name))
             for prop, value in props.items():

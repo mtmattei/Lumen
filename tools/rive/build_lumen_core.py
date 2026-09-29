@@ -521,8 +521,13 @@ def build() -> bytes:
     number("stressedSubsystem", -1)    # extension: localized instability (-1 = none)
 
     # Listeners: pointer on the Core and on each subsystem node.
+    # Current runtimes read the listener type from a ListenerInputType child; older ones read
+    # listenerTypeValue on the listener itself. Write both, and declare the new key for old readers.
+    f.declare("ListenerInputType", "listenerTypeValue")
+
     def listener(name, target, kind, actions):
         f.add("StateMachineListenerSingle", name=name, targetId=target, listenerTypeValue=kind)
+        f.add("ListenerInputType", listenerTypeValue=kind)
         for type_name, props in actions:
             f.add(type_name, **props)
 

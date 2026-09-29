@@ -495,3 +495,8 @@ tools/rive/verify/node_modules/
 tools/rive/verify/site/
 tools/rive/verify/shots/
 tools/rive/__pycache__/
+
+# Native Rive bridge: build outputs (native/lumen-rive/build.sh | build.ps1)
+native/lumen-rive/.deps/
+native/lumen-rive/.build/
+Lumen.Rive/runtimes/
