@@ -103,7 +103,7 @@ internal static unsafe class SkiaBridge
     private static void PathAddPath(IntPtr p, IntPtr source, float xx, float xy, float yx, float yy, float tx, float ty)
     {
         var matrix = Matrix(xx, xy, yx, yy, tx, ty);
-        Get<SkiaPath>(p).Path.AddPath(Get<SkiaPath>(source).Path, ref matrix, SKPathAddMode.Append);
+        Get<SkiaPath>(p).Path.AddPath(Get<SkiaPath>(source).Path, in matrix, SKPathAddMode.Append);
     }
 
     // ── paint ──
@@ -169,7 +169,7 @@ internal static unsafe class SkiaBridge
     private static void Transform(IntPtr r, float xx, float xy, float yx, float yy, float tx, float ty)
     {
         var matrix = Matrix(xx, xy, yx, yy, tx, ty);
-        Get<SkiaRenderer>(r).Canvas.Concat(ref matrix);
+        Get<SkiaRenderer>(r).Canvas.Concat(in matrix);
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]

@@ -10,7 +10,7 @@ namespace Lumen.Rive;
 /// The single adapter between Uno and the Core animation. Uno pushes normalized state in; animation
 /// milestones come back out as <see cref="CoreEvent"/>s for <see cref="RiveEventAdapter"/>.
 /// </summary>
-public sealed class LumenCorePresenter : ILumenCorePresenter, IDisposable
+public sealed class LumenCorePresenter : ICoreStagePresenter, IDisposable
 {
     private readonly LumenCoreRenderer _renderer = new();
     private readonly LumenCoreCanvas? _canvas;
@@ -36,6 +36,19 @@ public sealed class LumenCorePresenter : ILumenCorePresenter, IDisposable
     public bool IsAvailable { get; }
 
     public LumenCoreRenderer Renderer => _renderer;
+
+    public string Engine => "Procedural (fallback)";
+
+    public SKPoint Center => _renderer.Center;
+
+    public float Radius => _renderer.Radius;
+
+    public CoreMode Mode => _renderer.Mode;
+
+    public void Pointer(CorePointer kind, double x, double y)
+    {
+        // The procedural renderer has no listeners; CoreStage hit-tests through HitTestSubsystem.
+    }
 
     /// <summary>Last applied values, for the developer overlay.</summary>
     public LumenVisualState LastState { get; private set; }

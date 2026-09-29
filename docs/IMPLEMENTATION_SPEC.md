@@ -13,6 +13,10 @@ This document records how v1 is built in this repository and which decisions wer
 **Reason:** No `lumen-core.riv` exists yet (it must be authored in the Rive editor), and the only public .NET Rive runtime on NuGet (`Rive.RiveSharp 1.0.5-alpha`, Dec 2022) ships Windows-only native binaries against SkiaSharp 2.88, while Uno.Sdk 6.7 uses SkiaSharp 3.119. It cannot run on desktop Linux/macOS, WASM or mobile as-is.
 **Tradeoff:** The showcase's "Rive" half is a stand-in until a compatible runtime exists. The adapter boundary is the same one a Rive presenter would use, so the swap touches one class (`LumenCorePresenter`) plus DI registration.
 
+**Decision:** Play `lumen-core.riv` through rive-runtime (C++) compiled per platform, with rendering delegated to a C# SkiaSharp bridge (`native/lumen-rive` + `Lumen.Rive`), selected at startup with the procedural presenter as fallback.
+**Reason:** Uno renders every target through Skia, so drawing Rive's paths with SkiaSharp keeps the Core on the same canvas as the XAML. Rive's own GPU renderer would need a separate native surface, and the web runtime only covers WebAssembly.
+**Tradeoff:** Native builds per target. Linux desktop is verified; Windows and macOS are scripted; mobile and WASM are still open.
+
 **Decision:** Generate `lumen-core.riv` from code (`tools/rive/`) against the rive-runtime schema, and verify it in the official Rive web runtime.
 **Reason:** No Rive editor access in this environment; generating from a script keeps the contract (input order, event names, thresholds staying in C#) reviewable and reproducible.
 **Tradeoff:** Procedural artwork, no editor `.rev` source. A designer can import the `.riv` into the editor to refine it, but after that the generator is no longer the source of truth.
@@ -128,6 +132,6 @@ Pointer movement writes directly to presenter inputs (no XAML property changes),
 
 ## Unresolved Questions
 
-- Which Rive runtime plays `lumen-core.riv` in Uno (native rive-runtime bound for Uno/Skia, a RiveSharp rebuild against SkiaSharp 3, or `@rive-app` via JS interop on WASM only)?
+- Where do CI builds of `liblumen_rive` run (Windows, macOS, Android NDK, iOS, Emscripten 3.1.56), and do the binaries ship in a NuGet package?
 - Does a motion designer take over `lumen-core.riv` in the Rive editor, retiring the generator as source of truth?
 - Should Network show real peer instances (sync server) or stay simulated for v1?

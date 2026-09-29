@@ -205,7 +205,7 @@ public sealed partial class ShellPage : Page
 
     private void PropagatePulse()
     {
-        var origin = Core.TransformToVisual(Root).TransformPoint(new Windows.Foundation.Point(Core.Presenter.Renderer.Center.X, Core.Presenter.Renderer.Center.Y));
+        var origin = Core.TransformToVisual(Root).TransformPoint(new Windows.Foundation.Point(Core.Presenter.Center.X, Core.Presenter.Center.Y));
         foreach (var element in FindPulseReceivers(Root))
         {
             if (element is not FrameworkElement fe || fe.ActualWidth <= 0 || !IsShown(fe)) continue;
@@ -436,7 +436,7 @@ public sealed partial class ShellPage : Page
     private void UpdateDeveloperOverlay()
     {
         DevOverlay.Children.Clear();
-        AddRegion(Core, "CORE PRESENTER · RIVE CONTRACT (LumenCore)", "InformationBrush");
+        AddRegion(Core, $"CORE · {Core.Presenter.Engine.ToUpperInvariant()} · LumenCore", "InformationBrush");
         AddRegion(NavArea, "UNO · NAVIGATION", "NominalBrush");
         AddRegion(ContextArea, "UNO · CONTEXT", "NominalBrush");
         AddRegion(Rail, "UNO · TELEMETRY RAIL", "NominalBrush");
@@ -461,7 +461,8 @@ public sealed partial class ShellPage : Page
         b.AppendLine(CultureInfo.InvariantCulture, $"pointerDistance  {i.PointerDistance:0.00}");
         b.AppendLine(CultureInfo.InvariantCulture, $"interactionForce {i.InteractionForce:0.00}");
         b.AppendLine(CultureInfo.InvariantCulture, $"gravityX/Y       {i.GravityX:+0.00;-0.00} {i.GravityY:+0.00;-0.00}");
-        b.AppendLine(CultureInfo.InvariantCulture, $"mode             {Core.Presenter.Renderer.Mode}");
+        b.AppendLine(CultureInfo.InvariantCulture, $"engine           {Core.Presenter.Engine}");
+        b.AppendLine(CultureInfo.InvariantCulture, $"mode             {Core.Presenter.Mode}");
         b.AppendLine(CultureInfo.InvariantCulture, $"telemetry        10 Hz · render {Core.Presenter.FramesPerSecond:0} fps");
         b.Append("* contract extension");
         DevBindings.Text = b.ToString();

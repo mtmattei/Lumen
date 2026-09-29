@@ -11,12 +11,16 @@ Uno Platform showcase from the spec kit in [`spec-kit/`](spec-kit/README.md). Im
 | Project | Target | Contents |
 |---|---|---|
 | `Lumen.Core` | `net10.0` | Domain, deterministic causal simulator, state classifier, cooling-fault scenario (loads the spec-kit fixture), presenter contract, pointer field, press gesture, first-run timeline, onboarding coach |
-| `Lumen` | Uno single project (desktop, wasm, android, ios) | Shell, five experiences, procedural Core presenter, controls, styles |
-| `Lumen.Tests` | `net10.0`, xUnit v3 | 52 tests over `Lumen.Core`; no UI or Rive needed |
+| `Lumen` | Uno single project (desktop, wasm, android, ios) | Shell, five experiences, Rive and procedural Core presenters, controls, styles |
+| `Lumen.Rive` | `net10.0` | SkiaSharp bridge + `RiveScene` over the native Rive runtime (`native/lumen-rive`) |
+| `Lumen.Tests` | `net10.0`, xUnit v3 | 59 tests: domain/simulator, plus `lumen-core.riv` rendered headlessly through the native runtime (skipped where it isn't built) |
 
 ## Build, test, run
 
 ```powershell
+# Native Rive runtime (optional; without it the procedural Core is used)
+native/lumen-rive/build.sh            # Linux/macOS  (Windows: native/lumen-rive/build.ps1)
+
 # Tests (Microsoft.Testing.Platform runner, configured in global.json)
 dotnet test --project Lumen.Tests
 
@@ -61,12 +65,11 @@ CoreStage press events + presenter milestones ──► RiveEventAdapter ──�
 
 ![lumen-core.riv rendered by the Rive runtime](docs/screenshots/rive-core-states.png)
 
-The app does not play it yet. The only public .NET Rive runtime (`Rive.RiveSharp 1.0.5-alpha`, 2022) ships Windows-only native binaries against SkiaSharp 2.88, while Uno.Sdk 6.7 uses SkiaSharp 3.119. Until a runtime is chosen, the Core is drawn by `Lumen/Rive/LumenCoreRenderer.cs`, a procedural SkiaSharp stand-in for the same contract.
+**The app plays it through the native Rive runtime** when `liblumen_rive` is built for the platform. The Core then renders with SkiaSharp on the same canvas as the XAML ([`native/lumen-rive`](native/lumen-rive/README.md)). Otherwise it falls back to the procedural renderer (`Lumen/Rive/LumenCoreRenderer.cs`), which implements the same contract. `LUMEN_CORE=procedural` forces the fallback. Developer view (Ctrl+Shift+D) shows the active engine.
 
-To switch to Rive:
-1. Pick a runtime: native `rive-runtime` bound for Uno/Skia, or `@rive-app` via JS interop on the WebAssembly head.
-2. Replace `LumenCoreRenderer` + `LumenCoreCanvas` with a Rive view, and map `Apply`/`Trigger`/`SetInteraction` onto the state-machine inputs inside `LumenCorePresenter`. `systemState` uses the same order as `SystemState`.
-3. Forward Rive events to `EventRaised`. `SubsystemSelected` carries its id as a custom `id` property. `RiveEventAdapter`, the view model and all tests stay unchanged.
+![Rive runtime in the app](docs/screenshots/rive-in-app-overview.png)
+
+Status: Linux desktop is verified. Windows and macOS have build scripts. Android, iOS and WebAssembly are not started. In Rive mode, Energy Flow and Network show the Core without their overlays, and the Explorer focus offset isn't in the file yet.
 
 Contract extensions (flagged `*` in developer view): `stressedSubsystem` (in the `.riv`), `pressed` (in the `.riv`, set by its own listeners), and `netFlow` (stand-in only; Energy Flow stays in Uno/Skia).
 

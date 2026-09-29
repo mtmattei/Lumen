@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
+    <ProjectReference Include="..\Lumen.Rive\Lumen.Rive.csproj" />
   </ItemGroup>
 
 </Project>

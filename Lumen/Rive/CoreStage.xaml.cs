@@ -13,7 +13,6 @@ namespace Lumen.Rive;
 public sealed partial class CoreStage : UserControl
 {
     private readonly PressGesture _press = new();
-    private readonly LumenCoreCanvas? _canvas;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _holdTimer;
     private double _gravityX;
     private double _gravityY;
@@ -28,21 +27,7 @@ public sealed partial class CoreStage : UserControl
     {
         InitializeComponent();
 
-        if (LumenCoreCanvas.IsSupportedOnCurrentPlatform())
-        {
-            try
-            {
-                _canvas = new LumenCoreCanvas();
-                HitArea.Children.Insert(0, _canvas);
-            }
-            catch (Exception)
-            {
-                _canvas = null;
-            }
-        }
-
-        FallbackText.Visibility = _canvas is null ? Visibility.Visible : Visibility.Collapsed;
-        Presenter = new LumenCorePresenter(_canvas, DispatcherQueue);
+        Presenter = CreatePresenter();
 
         HitArea.PointerMoved += OnPointerMoved;
         HitArea.PointerPressed += OnPointerPressed;
@@ -56,7 +41,45 @@ public sealed partial class CoreStage : UserControl
         Unloaded += (_, _) => _holdTimer?.Stop();
     }
 
-    public LumenCorePresenter Presenter { get; }
+    public ICoreStagePresenter Presenter { get; }
+
+    /// <summary>
+    /// Rive runtime when liblumen_rive and lumen-core.riv load; the procedural renderer otherwise
+    /// (spec: if Rive fails, Uno status and controls remain usable). LUMEN_CORE=procedural forces the fallback.
+    /// </summary>
+    private ICoreStagePresenter CreatePresenter()
+    {
+        if (!LumenCoreCanvas.IsSupportedOnCurrentPlatform())
+        {
+            FallbackText.Visibility = Visibility.Visible;
+            return new LumenCorePresenter(null, DispatcherQueue);
+        }
+
+        if (Environment.GetEnvironmentVariable("LUMEN_CORE") != "procedural" && TryLoadRive() is { } scene)
+        {
+            var riveCanvas = new RiveCoreCanvas();
+            HitArea.Children.Insert(0, riveCanvas);
+            return new RiveCorePresenter(scene, riveCanvas, DispatcherQueue);
+        }
+
+        var canvas = new LumenCoreCanvas();
+        HitArea.Children.Insert(0, canvas);
+        return new LumenCorePresenter(canvas, DispatcherQueue);
+    }
+
+    private static RiveScene? TryLoadRive()
+    {
+        try
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "Assets", "Rive", "lumen-core.riv");
+            if (!RiveScene.IsRuntimeAvailable || !File.Exists(path)) return null;
+            return RiveScene.Load(File.ReadAllBytes(path), "LumenCore", "LumenCore");
+        }
+        catch (Exception e) when (e is InvalidDataException or IOException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>Press/charge/release events, routed to <see cref="RiveEventAdapter"/> with the presenter's events.</summary>
     public event EventHandler<CoreEvent>? PressEventRaised;
@@ -75,13 +98,13 @@ public sealed partial class CoreStage : UserControl
     private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
     {
         var p = e.GetCurrentPoint(HitArea).Position;
-        var r = Presenter.Renderer;
-        var dx = p.X - r.Center.X;
-        var dy = p.Y - r.Center.Y;
-        (_pointerX, _pointerY, _pointerDistance) = PointerField.Normalize(dx, dy, r.Radius);
+        Presenter.Pointer(CorePointer.Move, p.X, p.Y);
+        var dx = p.X - Presenter.Center.X;
+        var dy = p.Y - Presenter.Center.Y;
+        (_pointerX, _pointerY, _pointerDistance) = PointerField.Normalize(dx, dy, Presenter.Radius);
         if (_press.Phase != PressPhase.Idle)
         {
-            (_contactX, _contactY) = ContactFor(dx, dy, r.Radius);
+            (_contactX, _contactY) = ContactFor(dx, dy, Presenter.Radius);
         }
 
         PushInteraction();
@@ -91,7 +114,7 @@ public sealed partial class CoreStage : UserControl
     {
         Focus(FocusState.Pointer);
         var p = e.GetCurrentPoint(HitArea).Position;
-        var r = Presenter.Renderer;
+        Presenter.Pointer(CorePointer.Down, p.X, p.Y);
 
         if (Presenter.HitTestSubsystem(p.X, p.Y) is { } id)
         {
@@ -100,18 +123,20 @@ public sealed partial class CoreStage : UserControl
             return;
         }
 
-        var dx = p.X - r.Center.X;
-        var dy = p.Y - r.Center.Y;
-        if (Math.Sqrt(dx * dx + dy * dy) > r.Radius * 1.15) return;
+        var dx = p.X - Presenter.Center.X;
+        var dy = p.Y - Presenter.Center.Y;
+        if (Math.Sqrt(dx * dx + dy * dy) > Presenter.Radius * 1.15) return;
 
         HitArea.CapturePointer(e.Pointer);
-        (_contactX, _contactY) = ContactFor(dx, dy, r.Radius);
+        (_contactX, _contactY) = ContactFor(dx, dy, Presenter.Radius);
         BeginPress();
         e.Handled = true;
     }
 
     private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
     {
+        var p = e.GetCurrentPoint(HitArea).Position;
+        Presenter.Pointer(CorePointer.Up, p.X, p.Y);
         if (_press.Phase == PressPhase.Idle) return;
         HitArea.ReleasePointerCapture(e.Pointer);
         Release();
@@ -122,7 +147,7 @@ public sealed partial class CoreStage : UserControl
     {
         switch (e.Key)
         {
-            case VirtualKey.Space or VirtualKey.Enter when Presenter.Renderer.Mode == CoreMode.Exploded:
+            case VirtualKey.Space or VirtualKey.Enter when Presenter.Mode == CoreMode.Exploded:
                 Presenter.RaiseSubsystemSelected(_keyboardSubsystem);
                 e.Handled = true;
                 break;
@@ -143,12 +168,12 @@ public sealed partial class CoreStage : UserControl
                 CollapseRequested?.Invoke(this, EventArgs.Empty);
                 e.Handled = true;
                 break;
-            case VirtualKey.Right or VirtualKey.Down when Presenter.Renderer.Mode == CoreMode.Exploded:
+            case VirtualKey.Right or VirtualKey.Down when Presenter.Mode == CoreMode.Exploded:
                 _keyboardSubsystem = (SubsystemId)(((int)_keyboardSubsystem + 1) % 6);
                 Presenter.RaiseSubsystemSelected(_keyboardSubsystem);
                 e.Handled = true;
                 break;
-            case VirtualKey.Left or VirtualKey.Up when Presenter.Renderer.Mode == CoreMode.Exploded:
+            case VirtualKey.Left or VirtualKey.Up when Presenter.Mode == CoreMode.Exploded:
                 _keyboardSubsystem = (SubsystemId)(((int)_keyboardSubsystem + 5) % 6);
                 Presenter.RaiseSubsystemSelected(_keyboardSubsystem);
                 e.Handled = true;
