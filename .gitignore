@@ -490,3 +490,8 @@ $RECYCLE.BIN/
 solution-config.props
 # Publish Profiles
 !**/Properties/PublishProfiles/*.pubxml
+# Rive verifier
+tools/rive/verify/node_modules/
+tools/rive/verify/site/
+tools/rive/verify/shots/
+tools/rive/__pycache__/

@@ -11,7 +11,11 @@ This document records how v1 is built in this repository and which decisions wer
 
 **Decision:** Render the living Core with a procedural SkiaSharp renderer (`SKCanvasElement`) behind `ILumenCorePresenter`, implementing the exact Rive contract (inputs, triggers, events).
 **Reason:** No `lumen-core.riv` exists yet (it must be authored in the Rive editor), and the only public .NET Rive runtime on NuGet (`Rive.RiveSharp 1.0.5-alpha`, Dec 2022) ships Windows-only native binaries against SkiaSharp 2.88, while Uno.Sdk 6.7 uses SkiaSharp 3.119. It cannot run on desktop Linux/macOS, WASM or mobile as-is.
-**Tradeoff:** The showcase's "Rive" half is a stand-in until a `.riv` and a compatible runtime exist. The adapter boundary is the same one a Rive presenter would use, so the swap touches one class (`LumenCorePresenter`) plus DI registration.
+**Tradeoff:** The showcase's "Rive" half is a stand-in until a compatible runtime exists. The adapter boundary is the same one a Rive presenter would use, so the swap touches one class (`LumenCorePresenter`) plus DI registration.
+
+**Decision:** Generate `lumen-core.riv` from code (`tools/rive/`) against the rive-runtime schema, and verify it in the official Rive web runtime.
+**Reason:** No Rive editor access in this environment; generating from a script keeps the contract (input order, event names, thresholds staying in C#) reviewable and reproducible.
+**Tradeoff:** Procedural artwork, no editor `.rev` source. A designer can import the `.riv` into the editor to refine it, but after that the generator is no longer the source of truth.
 
 **Decision:** MVVM with CommunityToolkit.Mvvm and `x:Bind`.
 **Reason:** State is a 10 Hz push stream plus imperative controls (sliders, toggles, press/hold). MVUX's feed projection adds allocations per tick and generator risk for no gain here.
@@ -28,6 +32,10 @@ This document records how v1 is built in this repository and which decisions wer
 **Decision:** Neutral token system from the spec on top of the Fluent base theme (no Material).
 **Reason:** The spec defines its own neutral palette, type roles and spacing; Material's color roles and filled components contradict "avoid SaaS styling".
 **Tradeoff:** Custom styles for the handful of controls used.
+
+**Decision:** No haptics in v1 (the first-run heartbeat at 1.4 s is visual only).
+**Reason:** Product decision; avoids per-platform vibration code before the mobile heads are validated.
+**Tradeoff:** The mobile "tactile remote" relies on touch and visuals alone for now.
 
 ---
 
@@ -120,7 +128,6 @@ Pointer movement writes directly to presenter inputs (no XAML property changes),
 
 ## Unresolved Questions
 
-- Who authors `lumen-core.riv`, and which Rive runtime targets Uno (official Uno/Skia runtime vs a RiveSharp rebuild against SkiaSharp 3)?
-- Ship Geist/Geist Mono font files in the app (OFL) or keep platform fonts?
+- Which Rive runtime plays `lumen-core.riv` in Uno (native rive-runtime bound for Uno/Skia, a RiveSharp rebuild against SkiaSharp 3, or `@rive-app` via JS interop on WASM only)?
+- Does a motion designer take over `lumen-core.riv` in the Rive editor, retiring the generator as source of truth?
 - Should Network show real peer instances (sync server) or stay simulated for v1?
-- Haptics on mobile: which API per platform, and is it worth the platform-specific code in v1?

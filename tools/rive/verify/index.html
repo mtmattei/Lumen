@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>lumen-core.riv verifier</title>
+  <style>
+    html, body { margin: 0; background: #0B0C0C; }
+    canvas { display: block; width: 500px; height: 500px; }
+  </style>
+  <script src="rive.js"></script>
+</head>
+<body>
+  <canvas id="c" width="500" height="500"></canvas>
+  <script>
+    // Harness state read by verify.mjs.
+    window.lumen = { events: [], ready: false, error: null };
+    rive.RuntimeLoader.setWasmUrl("rive.wasm");  // local runtime, no CDN
+    const r = new rive.Rive({
+      src: "lumen-core.riv",
+      canvas: document.getElementById("c"),
+      stateMachines: "LumenCore",
+      autoplay: true,
+      onLoad: () => {
+        r.resizeDrawingSurfaceToCanvas();
+        window.lumen.ready = true;
+        window.lumen.inputs = r.stateMachineInputs("LumenCore").map(i => ({ name: i.name, type: i.type }));
+        window.lumen.contents = r.contents;
+      },
+      onLoadError: e => { window.lumen.error = String(e && (e.data || e.message || e)); },
+    });
+    r.on(rive.EventType.RiveEvent, e => {
+      const d = e.data;
+      window.lumen.events.push({ name: d.name, properties: d.properties || {} });
+    });
+    window.lumen.set = (name, value) => {
+      const input = r.stateMachineInputs("LumenCore").find(i => i.name === name);
+      if (!input) throw new Error("missing input " + name);
+      if (input.type === rive.StateMachineInputType.Trigger) input.fire(); else input.value = value;
+    };
+  </script>
+</body>
+</html>

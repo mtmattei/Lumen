@@ -63,6 +63,6 @@ Status: ✅ met · ◐ met with a stand-in or partially · ☐ not yet
 
 ## Not verified here
 - `net10.0-android` / `net10.0-ios` builds (workloads not installed in this environment).
-- Tilt input and haptics on devices.
+- Tilt input on devices. (Haptics are out of scope for v1.)
 - Reduced-motion visual pass and a screen-reader pass.
 - WebAssembly head builds (`net10.0-browserwasm`, 0 warnings); it was not run in a browser here.
